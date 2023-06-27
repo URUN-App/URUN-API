@@ -5,6 +5,9 @@ var logger = require('morgan');
 
 const mongoose = require("./config/mongoose");
 
+//router
+const apiRouter = require("./routes/api/general.router");
+
 
 var app = express();
 mongoose.connect();
@@ -14,6 +17,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//routes
+app.use("/api", apiRouter);
 
 
 

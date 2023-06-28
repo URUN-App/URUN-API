@@ -10,7 +10,7 @@ validators.registerValidator = [
     body("emailUser")
     .notEmpty().withMessage("This is a required field, please write a email.")
     .isEmail().withMessage("Pleas write a valid email"),
-    body("passwordUser")
+    body("password")
     .notEmpty().withMessage("This is a required field, please write a password.")
     .matches(passwordRegexp).withMessage("The password must have between 8 and 32 chars, and at least 1 M, 1 m and 1 #.")
 ]

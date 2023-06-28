@@ -22,7 +22,7 @@ controller.register = async (req, res) => {
         const newUser = new User({
             nameUser: nameUser,
             emailUser: emailUser,
-            passwordUser: password
+            password: password
         });
 
         await newUser.save();

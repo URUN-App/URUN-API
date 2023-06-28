@@ -2,7 +2,10 @@ const Mongoose = require("mongoose");
 const Schema = Mongoose.Schema;
 const debug = require("debug")("app:user-model");
 
-const crypto = require("crypto");
+
+//const crypto = require("crypto"); crypto has been deprecated
+
+const bcrypt = require("bcrypt");
 
 const userSchema = new Schema({
     nameUser: {
@@ -15,57 +18,43 @@ const userSchema = new Schema({
         require: true,
         trim: true
     },
-    passwordUser: {
+    password: {
         type: String,
         require: true
     },
     pictureUser: {
         type:String
     },
-    salt:{
-        type: String
-    },
-
     tokens:{
         type : [ String],
         default: []
 
     }
-
 });
 
-userSchema.methods = {
-   encryptPassword: function(password){
-    if(!password) return "";
 
-    try{
-        const encryptPassword = crypto.pbkdf2Sync(
-            password,
-            this.salt,
-            1000,64,
-            `sha512`
-        ).toString("hex");
+userSchema.pre('save', function(next){
+    var user = this;
 
-        return encryptPassword;
-    }catch (error){
-        debug({error});
-        return "";
-    }
-   },
-   makeSalt: function(){
-    return crypto.randomBytes(16).toString("hex");
-   },
-   comparePassword: function (password) {
-    return this.passwordUser === this.encryptPassword(password);
-   }
+    bcrypt.genSalt(10, function(err, Salt){
+        if(err) return next(err);
+
+        bcrypt.hash(user.password, Salt, function(err, hash){
+            if(err) return next(err);
+
+            user.password = hash;
+            next();
+        })
+    })
+})
+
+userSchema.methods.comparePassword = function(candidatePassword, cb){
+    bcrypt.compare(candidatePassword, this.password, function(err,isMatch){
+        if (err) return cb(err);
+        cb(null, isMatch);
+    })
 }
 
-userSchema.virtual("password")
-.set(function(password = crypto.randomBytes(16).toString()){
-    if(!password) return;
 
-    this.salt = this.makeSalt();
-    this.passwordUser = this.encryptPassword(password);
-})
 
 module.exports = Mongoose.model("User", userSchema);

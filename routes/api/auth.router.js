@@ -10,4 +10,6 @@ router.post('/signup',registerValidator,
 runValidator,
 authController.register);
 
+router.post('/signin', authController.login);
+
 module.exports = router;

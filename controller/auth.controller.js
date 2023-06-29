@@ -1,62 +1,73 @@
 const User = require("../models/user.model");
 const debug = require("debug")("app:auth-contoller");
-const bcrypt = require("bcrypt");
-
+const { createToken, verifyToken } = require("../helpers/jwtUtil");
+const { response } = require("express");
+const bcrypt = require("bcryptjs");
 
 const controller = {};
 
 //Registering user
 controller.register = async (req, res) => {
-    try {
-        //Getting the user information
-         const {nameUser,emailUser,password} = req.body;
+    // Getting the values 
+  const { username, email, password } = req.body;
 
-         //Verifying that the username or email doesnt exists already
-          const user = await User.findOne({ $or: [{nameUser: nameUser}, {emailUser:emailUser}]});
+  // Creating a new user
+  const newuser = new User({ username, email, password});
 
-        if(user){
-            return res.status(409).json({error: "This user is already in use."});
-        }  
- 
-        
+  // Check if the user exists/ email exists
+  const user = await User.findOne({ $or: [{ username: username }, { email: email }] });
 
-        const newUser = new User({
-            nameUser: nameUser,
-            emailUser: emailUser,
-            password: password
-        });
+  if (user) {
+    return res.status(400).json({
+      msg: "Username/ Email already exists",
+    });
+  }
 
-        await newUser.save();
+  // Encrypting password
+  const salt = bcrypt.genSaltSync();
+  newuser.password = bcrypt.hashSync(password, salt);
 
-        return res.status(201).json({message: "User created successfully"})
-    }catch (error){
-        debug({error});
-        return res.status(500).json({error: "Unexpected error"})
-    }
+  // saving user 
+  await newuser.save();
+
+  res.status(201).json({
+    msg: "User created successfully",
+  });
 }
 
 //login
-controller.login = async (req, res) => {
-    try {
-      const { identifier, password } = req.body;
-  
-      //Paso 01: Verificar si el usuario existe
-      const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
-  
-      if (!user) {
-        return res.status(404).json({ error: "El usuario no existe" });
-      }
-  
-      //Paso 02: Comparar las contraseñas
-      user.comparePassword(password, function(err, isMatch) {
-        if (err) throw err;
-        console.log(password, isMatch); 
-    });
-      
+controller.login = async(req, res = response) => {
+    const {email, password}= req.body;
 
-    } catch (error) {
-      debug(error);
-      return res.status(500).json({ error: "Error inesperado" })
+    const user = await User.findOne( {email});
+
+    if (!user) {
+        return res.status(400).json({
+          error: "Email  does not match",
+        });
+      }
+    //checking password
+    const isMatch = bcrypt.compareSync(password, user.password);
+
+    if(!isMatch){
+        return res.status(400).json({
+            error: "passoword/ user does not match"
+        })
+    }
+
+    //mock up login
+    return res.status(200).json({message: "Log in succesfull"});
+}
+
+
+
+  controller.whoami = async (req, res) => {
+    try {
+        const {_id,nameUser,emailUser} = req.user;
+        return res.status(200).json({_id, nameUser, emailUser});
+    }catch (error){
+        debug(error);
+        return res.status(500).json({error: "Unexpected error"})
     }
   }
 

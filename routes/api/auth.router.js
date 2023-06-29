@@ -12,4 +12,6 @@ authController.register);
 
 router.post('/signin', authController.login);
 
+router.get('/whoami',authController.whoami);
+
 module.exports = router;

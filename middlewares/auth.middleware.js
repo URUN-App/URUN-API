@@ -1,7 +1,7 @@
 const{verifyToken} = require('../helpers/jwtUtil');
 const debug = require("debug")("app:auth-middleware");
 const User = require("../models/user.model");
-
+const ROLES = require("../data/roles.constants.json")
 const middleware = {};
 const tokenPrefix = "Bearer"
 
@@ -55,6 +55,31 @@ middleware.authentication = async(req, res, next) => {
         return res.status(500).json({ error: "Unexpected error"});
     }
 }
+
+middleware.authorization = (roleRequired = ROLES.SYSADMIN) => {
+    return (req, res, next) => {
+      try {
+        //Paso 0: Asumir que se ejecuta después del proceso de autenticacion
+        const { roles = [] } = req.user;
+  
+        //Paso 1: Verificar si el rol existe en el arreglo
+        const roleIndex =
+          roles.findIndex(role => (role === roleRequired || role === ROLES.SYSADMIN));
+  
+        //Paso 2: Realizar el filtro de rol
+        if (roleIndex < 0) {
+          return res.status(403).json({ error: "No tienes permiso" });
+        }
+  
+        //Paso 3: Pasar al siguiente middleware
+        next();
+      } catch (error) {
+        debug({ error });
+        return res.status(500).json({ error: "Error inesperado de servidor" });
+      }
+    }
+  }
+  
 
 
 

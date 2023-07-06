@@ -10,7 +10,7 @@ const pasosSchema = new Schema({
     },
     Pasos: {
         type: Number
-    },
+    }
     
 })
 

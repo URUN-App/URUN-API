@@ -5,8 +5,23 @@ const User = require("../models/user.model");
 const controller = {};
 
 
+//Geting the information of the user for their profile
+controller.getInfo = async(req, res) => {
+  try {
+    const { _id: userId } = req.user;
+
+    const user =
+      await User
+        .find({ _id: userId})
+    return res.status(200).json({ user })
+  } catch (error) {
+    debug({ error });
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
 //Getting all users
-controller.getUsers = async(request, response) => {
+/* controller.getUsers = async(request, response) => {
     //default time limit and skip
 
     const {limit=5 , skip=0} = request.body;
@@ -30,10 +45,10 @@ controller.getUsers = async(request, response) => {
     });
 
 
-} 
+}  */
 
 // Updating an user
- controller.usersPut = async (req, res) => {
+/*  controller.usersPut = async (req, res) => {
     // getting the id that was sent
     const { id } = req.params;
     // extracting values that we will not be able to update
@@ -53,11 +68,11 @@ controller.getUsers = async(request, response) => {
       msg: "User updated successfully",
       user: userDB,
     });
-  };
+  }; */
   
 
 //delete user
-controller.usersDelete = async (req, res) => {
+/* controller.usersDelete = async (req, res) => {
     //getting the id of the users we are going to delete
     const { id } = req.params;
   
@@ -73,10 +88,10 @@ controller.usersDelete = async (req, res) => {
       msg: "User deleted successfully",
       user,
     });
-  };
+  }; */
 
 // follow an user
-controller.usersFollow = async (req, res) => {
+/* controller.usersFollow = async (req, res) => {
     // getting the id of the user that wants to follow another user
     const { id } = req.params;
   
@@ -137,9 +152,9 @@ controller.usersFollow = async (req, res) => {
       msg: "Friend added successfully",
       user,
     });
-  };
+  }; */
 
-  controller.usersGetOne = async (req, res) => {
+ /*  controller.usersGetOne = async (req, res) => {
     // getting the id of the user that we are going to get
     const { id } = req.params;
   
@@ -152,7 +167,7 @@ controller.usersFollow = async (req, res) => {
     res.json({
       user,
     });
-  };
+  }; */
 
 module.exports = controller;
 

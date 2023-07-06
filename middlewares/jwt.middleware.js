@@ -7,7 +7,7 @@ const User = require("../models/user");
 const validateJWT = async (req = request, res = response, next) => {
   const token = req.header("x-token");
 
-  // Check is the token was provided
+  // Checks if the token was provided
   if (!token) {
     return res.status(401).json({
       msg: "No token, authorization denied",
@@ -15,19 +15,19 @@ const validateJWT = async (req = request, res = response, next) => {
   }
 
   try {
-    // get the uid from the token
+    // gets the uid from the token
     const { uid } = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(uid);
 
-    // check if the token belongs to an user
+    // checks if the token belongs to an user
     if (!user) {
       return res.status(404).json({
         msg: "Error validating token - The user not found",
       });
     }
 
-    // check if the user that belongs to the token is active
+    // checks if the user that belongs to the token is active
     if (!user.status) {
       return res.status(401).json({
         msg: "Error validating token - User is not active",

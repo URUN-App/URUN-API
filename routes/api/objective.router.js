@@ -10,6 +10,8 @@ const objectiveController = require("../../controller/objetivos.controller");
 router.post('/createObjective', authentication,authorization(ROLES.USER),runValidators,
                                 objectiveController.setObjective);
 
-router.get('/userObjective', objectiveController.getObjective)
+router.get('/userObjective', authentication,objectiveController.getObjective);
+
+router.get("/", objectiveController.findAll);
 
 module.exports = router;

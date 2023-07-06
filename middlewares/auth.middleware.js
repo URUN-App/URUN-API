@@ -7,15 +7,15 @@ const tokenPrefix = "Bearer"
 
 middleware.authentication = async (req, res, next) => {
   try {
-    //Paso 01: Verificar que authorization exista
+    // Verify that authorization exists
     const { authorization } = req.headers;
 
     if (!authorization) {
       return res.status(401).json({ error: "No autorizado" });
     }
 
-    //Paso 02: Verificar que sea un token valido
-    //Prefijo Token -> Bearer flñadsjfñlasjfdñljasñlfjñlaksdf
+    // Verifying that it is a valid token
+    // Token -> Bearer 
     const [prefix, token] = authorization.split(" ");
 
     if (prefix !== tokenPrefix) {
@@ -35,24 +35,24 @@ middleware.authentication = async (req, res, next) => {
     const { userId } = tokenObject;
     debug(userId);
 
-    //Paso 03: Obtener al usuario
+    // Getting the user
     const user = await User.findById(userId);
 
     if (!user) {
       return res.status(401).json({ error: "No autorizado" });
     }
 
-    //Paso 04: Token registrado
+    // Registered token
     const isTokenValid = user.tokens.includes(token);
     if (!isTokenValid) {
       return res.status(401).json({ error: "No autorizado" });
     }
 
-    //Paso 05: Modificar la req para tener la info del usuario
+    // Modifying the req to have the user info
     req.user = user;
     req.token = token;
 
-    //Paso 06: Pasar al siguiente middleware
+    // Move to the next middleware
     next();
   } catch (error) {
     debug({ error })
@@ -63,19 +63,19 @@ middleware.authentication = async (req, res, next) => {
 middleware.authorization = (roleRequired = ROLES.SYSADMIN) => {
   return (req, res, next) => {
     try {
-      //Paso 0: Asumir que se ejecuta después del proceso de autenticacion
+      
       const { roles = [] } = req.user;
 
-      //Paso 1: Verificar si el rol existe en el arreglo
+      // Checking if the role exists in the array
       const roleIndex =
         roles.findIndex(role => (role === roleRequired || role === ROLES.SYSADMIN));
 
-      //Paso 2: Realizar el filtro de rol
+      // Perform role filter
       if (roleIndex < 0) {
         return res.status(403).json({ error: "No tienes permiso" });
       }
 
-      //Paso 3: Pasar al siguiente middleware
+      //next middleware
       next();
     } catch (error) {
       debug({ error });

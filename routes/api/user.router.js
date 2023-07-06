@@ -2,10 +2,16 @@ const express = require('express');
 const router = express.Router();
 const { check } = require("express-validator");
 
-const JWT = require('../../middlewares/jwt.middleware');
+const {authentication} = require("../../middlewares/auth.middleware");
+
+/* const JWT = require('../../middlewares/jwt.middleware'); */
 const userController = require('../../controller/user.controller');
 //todo: "add userExistByID to the db validator"
-router.get("/users",JWT.validateJWT,userController.getUsers);
+
+
+router.get("/myInfo",authentication,userController.getInfo);
+
+/* router.get("/users",JWT.validateJWT,userController.getUsers);
 
 router.get("/:id", JWT.validateJWT, userController.usersGetOne);
 
@@ -17,7 +23,7 @@ router.put("/:id", [JWT.validateJWT, check("id", "is not a valid ID").isMongoId(
 router.post(
     "/follows/:id", [JWT.validateJWT, check("id", "is not a valid ID").isMongoId(),
                                     userController.usersFollow]
-);
+); */
 
 
 

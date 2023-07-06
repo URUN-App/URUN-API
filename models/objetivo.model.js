@@ -8,23 +8,27 @@ const objectiveSchema = new Schema({
         required: true
 
     },
+    Altura: {
+        type: Number
+    },
+    Peso: {
+        type: Number
+    },
     Actividad: {
         type: String
     },
     Periodo: {
         type: String
     },
-    Alcance:  {
-        Distancia:{
-            type: Number
-        },
-        Calorias:{
-            type:Number
-        },
-        Veces: {
-            type:Number
-        }
-    }
+    Distancia:{
+        type: Number
+    },
+    Calorias:{
+        type:Number
+    },
+     Veces: {
+        type:Number
+    }   
 })
 
 module.exports = Mongoose.model("Objective", objectiveSchema);

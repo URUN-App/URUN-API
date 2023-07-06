@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const secret = process.env.JWTSECRET || "secret";
-const expTime = process.env.TOKEN_EXP || "15m";
+const expTime = process.env.TOKEN_EXP || "15d";
 const helper = {};
 
 // Generating a JWT token
